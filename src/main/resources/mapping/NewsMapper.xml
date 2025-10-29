@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.NewsDao">
+
+    <resultMap id="NewsMap" type="News">
+        <id property="newsId" column="news_id" javaType="Integer"></id>
+        <result property="newsName" column="news_name" javaType="String"></result>
+        <result property="newsType" column="news_type" javaType="String"></result>
+        <result property="newsDetails" column="news_details" javaType="String"></result>
+        <result property="adminName" column="admin_name" javaType="String"></result>
+        <result property="createTime" column="create_time" javaType="Date"></result>
+        <result property="updateTime" column="update_time" javaType="Date"></result>
+        <result property="state" column="state" javaType="Integer"></result>
+    </resultMap>
+    <!--查询所有 id值对应dao中的方法名-->
+    <select id="findAll" resultMap="NewsMap">
+        select * from news where state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultMap="NewsMap">
+        select news_id,news_name,news_type,update_time from news where state=1 and
+        concat(news_name,news_type) like CONCAT('%',#{key},'%')
+    </select>
+    <!--添加-->
+    <insert id="addNews" parameterType="News">
+        insert into news(news_id,news_name,news_type,news_details,admin_name)
+        values(#{newsId},#{newsName},#{newsType},#{newsDetails},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int"  resultMap="NewsMap">
+        select * from news where news_id = #{newsId}
+    </select>
+    <!--修改-->
+    <update id="updateNews" parameterType="News">
+        update news set news_name=#{newsName},news_type=#{newsType},news_details=#{newsDetails},admin_name=#{adminName}
+        where news_id=#{newsId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteNews" parameterType="int">
+        update news set state=0 where news_id=#{newsId}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  news where news_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

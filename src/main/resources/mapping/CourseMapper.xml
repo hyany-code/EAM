@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.CourseDao">
+
+    <resultMap id="courseMap" type="Course">
+        <id property="courseId" column="course_id" javaType="Integer"></id>
+        <result property="courseName" column="course_name" javaType="String"></result>
+        <result property="courseType" column="course_type" javaType="String"></result>
+        <result property="teacherId" column="teacher_id" javaType="Integer"></result>
+        <result property="departmentId" column="department_id" javaType="Integer"></result>
+        <result property="academicYear"  column="academic_year" javaType="String"></result>
+        <result property="semester"  column="semester" javaType="String"></result>
+        <result property="time"  column="time" javaType="String"></result>
+        <result property="place"  column="place" javaType="String"></result>
+        <result property="creditHour" column="credit_hour" javaType="Integer"></result>
+        <result property="credit" column="credit" javaType="Integer"></result>
+        <result property="examType"  column="exam_type" javaType="String"></result>
+        <result property="planNumber" column="plan_number" javaType="Integer"></result>
+        <result property="selectedNumber" column="selected_number" javaType="Integer"></result>
+        <result property="adminName"  column="admin_name" javaType="String"></result>
+        <result property="createTime" column="create_time" javaType="Date"></result>
+        <result property="updateTime" column="update_time" javaType="Date"></result>
+        <association property="selectedcourse" javaType="selectedcourse">
+            <id property="optionId" column="option_id" javaType="Integer"></id>
+            <result property="courseId" column="course_id" javaType="Integer"></result>
+            <result property="studentId" column="student_id" javaType="Integer"></result>
+            <result property="score" column="score" javaType="Float"></result>
+            <result property="gpa" column="gpa" javaType="Float"></result>
+            <result property="teacherId" column="teacher_id" javaType="Integer"></result>
+        </association>
+        <association property="student" javaType="Student">
+            <id property="studentId" column="student_id" javaType="Integer"></id>
+            <result property="studentName" column="student_name" javaType="String"></result>
+        </association>
+        <association property="teacher" javaType="Teacher">
+            <id property="teacherId" column="teacher_id" javaType="Integer"></id>
+            <result property="teacherName" column="teacher_name" javaType="String"></result>
+        </association>
+        <association property="department" javaType="department">
+            <id property="departmentId" column="department_id" javaType="Integer"></id>
+            <result property="departmentName" column="department_name" javaType="String"></result>
+        </association>
+        <collection property="teacherList" ofType="Teacher">
+            <id property="teacherId" column="teacher_id" javaType="Integer"></id>
+            <result property="teacherName" column="teacher_name" javaType="String"></result>
+        </collection>
+        <collection property="departmentList" ofType="Department">
+            <id property="departmentId" column="department_id" javaType="Integer"></id>
+            <result property="departmentName" column="department_name" javaType="String"></result>
+        </collection>
+    </resultMap>
+    <!--查询所有 id值对应dao中的方法名-->
+    <select id="findAll" resultMap="courseMap">
+        select course_id,course_name,course_type,teacher.teacher_name,department_name,academic_year,semester,time,place,
+        credit_hour,credit,exam_type,plan_number,selected_number,course.admin_name
+        from course,teacher,department
+       where course.teacher_id = teacher.teacher_id and course.department_id = department.department_id and course.state = 1
+    </select>
+    <select id="findAllSelectedCourse" resultMap="courseMap">
+        select option_id,course_name,selectedcourse.course_id,student_name,score,gpa,teacher_name
+        from course,teacher,selectedcourse,student
+       where course.course_id = selectedcourse.course_id and teacher.teacher_id = selectedcourse.teacher_id
+       and student.student_id=selectedcourse.student_id and student.student_id=#{studentId}
+       and selectedcourse.state = 1
+    </select>
+    <select id="findAllTeachedCourse" resultMap="courseMap">
+        select course_id,course_name,course_type,teacher_name,academic_year,semester,time,place,
+        credit_hour,credit,exam_type,plan_number,selected_number
+        from course,teacher
+       where teacher.teacher_id=course.teacher_id and teacher.teacher_id=#{teacherId}
+       and course.state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultMap="courseMap">
+         select course_id,course_name,course_type,teacher.teacher_id,teacher.teacher_name,department_name,academic_year,semester,time,place,
+        credit_hour,credit,exam_type,plan_number,selected_number,course.admin_name
+  from course,teacher,department
+    where course.state = 1 and
+course.teacher_id = teacher.teacher_id
+ and course.department_id = department.department_id
+and concat(course_name,course_type) like '%' #{key} '%'
+    </select>
+    <!--添加-->
+    <insert id="addCourse" parameterType="Course">
+        insert into course(course_name,course_type,department_id,teacher_id,academic_year,semester,
+        time,place,credit_hour,credit,exam_type,plan_number,selected_number,admin_name)
+        values(#{courseName},#{courseType},#{departmentId},#{teacherId},#{academicYear},
+        #{semester},#{time},#{place},#{creditHour},#{credit},#{examType},#{planNumber},#{selectedNumber},#{adminName})
+    </insert>
+    <insert id="addCourse2">
+        insert into selectedcourse(course_id,student_id,score,gpa,teacher_id)
+        values(#{courseId},#{studentId},#{score},#{gpa},#{teacherId})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int"   resultMap="courseMap">
+        select course_id,course_name,course_type,teacher.teacher_name,department.department_name,academic_year,semester,time,place,
+        credit_hour,credit,exam_type,plan_number,selected_number,course.admin_name
+from course,teacher,department
+where course_id = #{courseId}
+and course.teacher_id = teacher.teacher_id and course.department_id = department.department_id
+    </select>
+    <!--修改-->
+    <update id="updateCourse" parameterType="Course">
+        update course set course_name=#{courseName},course_type=#{courseType},
+        department_id=#{departmentId},teacher_id=#{teacherId},academic_year=#{academicYear},semester=#{semester},
+        time=#{time},place=#{place},credit_hour=#{creditHour},
+        credit=#{credit},exam_type=#{examType},plan_number=#{planNumber},
+        selected_number=#{selectedNumber},admin_name=#{adminName}
+        where course_id=#{courseId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteCourse" parameterType="int">
+        update course set state=0 where course_id=#{courseId}
+    </update>
+
+    <update id="deleteSelectedCourse" parameterType="int">
+        update selectedcourse se,course co
+        set se.state=0,co.selected_number = co.selected_number - 1
+        where se.course_id=#{courseId}
+    </update>
+    <select id="querySelectedCourseCountById" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT
+            COUNT(*)
+        FROM selectedcourse
+        WHERE course_id = #{courseId}
+        and student_id = #{studentId}
+        and state = 1
+    </select>
+    <select id="queryPlanNum" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT c.plan_number
+        FROM course c
+        WHERE c.course_id = #{courseId}
+          and state = 1
+    </select>
+    <select id="querySelectedNum" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT c.selected_number
+        FROM course c
+        WHERE c.course_id = #{courseId}
+          and state = 1
+    </select>
+    <update id="addCourse3" parameterType="int">
+        update course
+        set selected_number = selected_number + 1
+        where course_id=#{courseId}
+    </update>
+
+
+</mapper>

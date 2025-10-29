@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.TeacherDao">
+
+    <!--登录-查询所有教师信息-->
+    <select id="getTeacher" parameterType="map" resultType="com.study.xuanke.model.Teacher">
+        select * from teacher
+        where 1=1
+            <if test="teacherId != null">
+               and teacher_id = #{teacherId}
+            </if>
+            <if test="teacherPassword != null">
+                and teacher_password = #{teacherPassword}
+            </if>
+    </select>
+    <!--查询所有选课学生信息-->
+    <select id="queryStudentInfoList" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.course_name,c.course_id,c.selected_number
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          and se.state=1
+          and se.teacher_id=#{teacherId}
+    </select>
+    <!--  根据关键字查询学生信息  -->
+    <select id="queryStudentInfoByKey" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.course_name,c.course_id,c.selected_number
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+        and se.student_id=s.student_id
+        and s.department_id=d.department_id
+        AND s.major_id=m.major_id
+        AND s.class_id=cl.class_id
+        and se.state=1
+        and se.teacher_id=#{teacherId}
+        <if test="courseId != null and courseId != ''">
+            AND se.course_id = #{courseId}
+        </if>
+        <if test="courseName != null and courseName != ''">
+            AND c.course_name LIKE '%' #{courseName} '%'
+        </if>
+    </select>
+    <!--  查询需要查询的选课学生信息记录条数  -->
+    <select id="queryStudentInfoCount" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT
+            COUNT(*)
+        FROM selectedcourse
+        WHERE 1 = 1
+    </select>
+    <!--查询所有成绩-->
+    <select id="queryScoreList" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+    <!--    select DISTINCT
+        s.option_id,
+        (SELECT c.course_name FROM course c WHERE c.course_id = s.course_id) as courseName,
+        s.course_id,
+        (SELECT stu.student_name FROM student stu WHERE stu.student_id = s.student_id) as studentName,
+        s.student_id,
+        (SELECT d.department_name FROM department d WHERE  d.department_id = stu.department_id) as departmentName,
+        (SELECT m.major_name FROM major m  WHERE  m.major_id = stu.major_id) as majorName,
+        (SELECT c1.class_name FROM class c1 WHERE  c1.class_id = stu.class_id) as className,
+        s.score,s.gpa
+        from selectedcourse s,student stu
+        where 1=1
+        and s.state=1
+        and s.teacher_id=#{teacherId}  -->
+        SELECT DISTINCT se.option_id,c.course_name,c.course_id,s.student_name,se.student_id,d.department_name,
+        m.major_name,cl.class_name,se.score,se.gpa
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+        and se.student_id=s.student_id
+        and s.department_id=d.department_id
+        AND s.major_id=m.major_id
+        AND s.class_id=cl.class_id
+        and se.state=1
+        and se.teacher_id=#{teacherId}
+        ORDER BY c.course_id
+       <!-- limit #{startIndex},#{numPerPage}-->
+    </select>
+    <!--  根据关键字查询成绩  -->
+    <select id="queryScoreByKey" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT se.option_id,c.course_name,c.course_id,s.student_name,se.student_id,d.department_name,
+                        m.major_name,cl.class_name,se.score,se.gpa
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+        and se.state=1
+        and se.teacher_id=#{teacherId}
+        <if test="courseId != null and courseId != ''">
+            AND se.course_id = #{courseId}
+        </if>
+        <if test="courseName != null and courseName != ''">
+            AND c.course_name LIKE '%' #{courseName} '%'
+        </if>
+        <if test="studentId != null and studentId != ''">
+            AND se.student_id = #{studentId}
+        </if>
+        <if test="studentName != null and studentName != ''">
+            AND s.student_name LIKE '%' #{studentName} '%'
+        </if>
+        ORDER BY c.course_id
+    </select>
+    <!--  关键字查询成绩结果的记录条数  -->
+    <select id="queryScoreCount" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT
+            COUNT(*)
+        FROM selectedcourse
+        WHERE 1 = 1
+    </select>
+    <!--  根据选课id查询全部,用于修改数据时回显  -->
+    <select id="getByOptionId"  parameterType="Integer" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT se.option_id,c.course_name,c.course_id,s.student_name,se.student_id,d.department_name,
+                        m.major_name,cl.class_name,se.score,se.gpa,c.credit_hour
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          and se.state=1
+          and se.option_id = #{optionId}
+    </select>
+    <!--  选课id查询学生信息,根据关键字查询  -->
+    <select id="getByCourseId"  parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.course_name,c.course_id,d.department_name,
+                        m.major_name,cl.class_name
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          and se.state=1
+          and se.course_id = #{courseId}
+          and se.teacher_id = #{teacherId}
+        <if test="departmentName != null and departmentName != ''">
+            AND d.department_name LIKE '%' #{departmentName} '%'
+        </if>
+        <if test="majorName != null and majorName != ''">
+            AND m.major_name LIKE '%' #{majorName} '%'
+        </if>
+        <if test="className != null and className != ''">
+            AND cl.class_name LIKE '%' #{className} '%'
+        </if>
+    </select>
+    <!--  导出本课程学生信息excel  -->
+    <select id="export" parameterType="list" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.course_id,c.course_name,s.student_id,s.student_name,d.department_name,
+                        m.major_name,cl.class_name
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          and se.state=1
+          and se.course_id = #{courseId}
+          and se.teacher_id = #{teacherId}
+    </select>
+    <!--  导出班级学生信息excel  -->
+    <select id="exportClassInfo" parameterType="list" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.course_id,c.course_name,s.student_id,s.student_name,d.department_name,
+                        m.major_name,cl.class_name
+        FROM selectedcourse se,course c,student s,department d,major m,class cl
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and s.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          and se.state=1
+          and se.course_id = #{courseId}
+          and se.teacher_id = #{teacherId}
+          and cl.class_name = #{className}
+    </select>
+    <!--
+            SELECT DISTINCT
+                s.option_id,
+                (SELECT c.course_name FROM course c WHERE c.course_id = s.course_id) as courseName,
+                s.course_id,
+                (SELECT stu.student_name FROM student stu WHERE stu.student_id = s.student_id) as studentName,
+                s.student_id,
+                (SELECT d.department_name FROM department d WHERE  d.department_id = stu.department_id) as departmentName,
+                (SELECT m.major_name FROM major m  WHERE  m.major_id = stu.major_id) as majorName,
+                (SELECT c1.class_name FROM class c1 WHERE  c1.class_id = stu.class_id) as className,
+                s.score,s.gpa
+            FROM selectedcourse s,student stu
+            WHERE 1=1
+            and option_id = #{optionId}
+            -->
+    <!--  添加、修改成绩  -->
+    <update id="updateScore" parameterType="com.study.xuanke.model.SelectedCourse">
+       update selectedcourse
+        set
+            <if test="score != null and score != ''">
+                score = #{score},
+            </if>
+            <if test="gpa != null and gpa != ''">
+                gpa = #{gpa}
+            </if>
+        where option_id=#{optionId}
+    </update>
+
+    <!--逻辑删除成绩-->
+    <update id="deleteScore" parameterType="Integer">
+        update selectedcourse set state=0 where option_id=#{optionId}
+    </update>
+    <!--  批量删除成绩记录  -->
+    <update id="batchDeletesScore" parameterType="java.util.List">
+        update selectedcourse
+            set state = 0
+        where option_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--查询所有-->
+    <select id="findAll" resultType="teacher">
+        select * from teacher where state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultType="teacher">
+        select * from teacher where state =1
+        and concat(teacher_name,teacher_sex,department_id) like'%' #{key} '%'
+    </select>
+    <!--添加-->
+    <insert id="addTeacher" parameterType="Teacher">
+        insert into teacher(teacher_name,teacher_sex,department_id,title,teacher_phone,
+        teacher_address,teacher_password,admin_name)
+        values(#{teacherName},#{teacherSex},#{departmentId},#{title},#{teacherPhone},#{teacherAddress},#{teacherPassword},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int" resultType="teacher">
+        select * from teacher where teacher_id = #{teacherId} and state=1
+    </select>
+    <!--修改-->
+    <update id="updateTeacher" parameterType="Teacher">
+        update teacher set teacher_name=#{teacherName},teacher_sex=#{teacherSex},department_id=#{departmentId},
+        title=#{title},teacher_phone=#{teacherPhone},teacher_address=#{teacherAddress},teacher_password=#{teacherPassword},admin_name=#{adminName}
+        where teacher_id = #{teacherId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteTeacher" parameterType="int">
+        update teacher set state=0 where teacher_id=#{teacherName}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  teacher where teacher_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <!--修改密码-->
+    <update id="updatePassword">
+        update teacher
+        set teacher_password = #{teacherPassword}
+        where teacher_id=#{teacherId}
+    </update>
+
+    <select id="getTeachersByDepartmentId" resultType="teacher">
+        select * from teacher where state = 1 and department_id = #{departmentId}
+    </select>
+
+    <!--教师个人信息显示-->
+    <select id="findTeacherInfo" parameterType="map" resultType="com.study.xuanke.model.Teacher">
+        SELECT t.teacher_name,teacher_sex,d.department_name,title,teacher_phone,teacher_address
+FROM teacher t,department d
+WHERE
+t.department_id = d.department_id
+AND t.state = 1
+AND t.teacher_id = #{teacherId}
+    </select>
+    <!--教师个人信息显示-->
+    <select id="checkEmail" parameterType="map" resultType="com.study.xuanke.model.Teacher">
+        SELECT t.email
+        FROM teacher t
+        WHERE t.state = 1
+          AND t.teacher_id = #{teacherId}
+          AND t.email = #{email}
+    </select>
+
+</mapper>

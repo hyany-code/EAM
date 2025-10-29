@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+      http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--扫描容器内组件,可以排除扫描Controller-->
+    <context:component-scan base-package="com.study.xuanke"/>
+
+    <!--加载属性文件-->
+    <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+    <!--读取属性文件-->
+    <context:property-placeholder location="classpath:mail.properties" ignore-unresolvable="true"/>
+    <!--读取属性文件，读取所有后缀为properties的属性文件-->
+<!--    <context:property-placeholder location="classpath:*.properties" />-->
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- 将mybatis的SqlSesssionFactory注入到Spring容器，并设置数据源和xml文件路径
+    注意mapping目录放置在resources目录下，项目中mapper文件放置在mapping目录中-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+
+        <property name="mapperLocations" value="classpath:mapping/*.xml"></property>
+    </bean>
+
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com/study/xuanke/dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!--配置邮件接口-->
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${mail.smtp.host}"/>
+        <property name="username" value="${mail.smtp.username}"/>
+        <property name="password" value="${mail.smtp.password}"/>
+        <property name="defaultEncoding" value="${mail.smtp.defaultEncoding}"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
+                <prop key="mail.smtp.timeout">${mail.smtp.timeout}</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- 事务管理 XML配置方式-->
+    <!-- 1.定义事务管理器，通过JDBC管理事务——AOP中的切面 -->
+    <!--<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+    <!--<property name="dataSource" ref="dataSource"></property>-->
+    <!--</bean>-->
+    <!--&lt;!&ndash; 2. 配置事务属性 （事务隔离属性，传播属性）——如何使用切面&ndash;&gt;-->
+    <!--<tx:advice id="txAdvice" transaction-manager="txManager">-->
+    <!--<tx:attributes>-->
+    <!--&lt;!&ndash; 根据方法名指定事务的属性 REQUIRED表示当前有事务就加入事务，没有事务-->
+    <!--就创建新事务，保证方法在事务当中&ndash;&gt;-->
+    <!--<tx:method name="save*" propagation="REQUIRED" />-->
+    <!--<tx:method name="insert*" propagation="REQUIRED" />-->
+    <!--<tx:method name="add*" propagation="REQUIRED" />-->
+    <!--<tx:method name="create*" propagation="REQUIRED" />-->
+    <!--<tx:method name="delete*" propagation="REQUIRED" />-->
+    <!--<tx:method name="update*" propagation="REQUIRED" />-->
+    <!--<tx:method name="find*" propagation="SUPPORTS" read-only="true" />-->
+    <!--<tx:method name="select*" propagation="SUPPORTS" read-only="true" />-->
+    <!--<tx:method name="get*" propagation="SUPPORTS" read-only="true" />-->
+    <!--</tx:attributes>-->
+    <!--</tx:advice>-->
+    <!--&lt;!&ndash;  3. 配置事务切入点, 以及把事务切入点和事务属性关联起来,织入操作  &ndash;&gt;-->
+    <!--<aop:config>-->
+    <!--<aop:pointcut expression="execution(* com.study.xuanke.service..*.*(..))"-->
+    <!--id="txPointCut"/>-->
+    <!--<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>-->
+    <!--</aop:config>-->
+
+    <!-- 事务由spring管理 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!--开启事务注解-->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+</beans>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.DepartmentDao">
+    <resultMap id="departmentMap" type="Department">
+        <id property="departmentId" column="department_id" javaType="Integer"></id>
+        <result property="departmentName" column="department_name" javaType="java.lang.String"></result>
+        <result property="teacherName" column="teacher_name" javaType="java.lang.String"></result>
+        <result property="adminName" column="admin_name" javaType="java.lang.String"></result>
+        <result property="createTime" column="create_time" javaType="Date"></result>
+        <result property="updateTime" column="update_time" javaType="Date"></result>
+        <result property="state" column="state" javaType="Integer"></result>
+    </resultMap>
+    <!--查询所有-->
+    <select id="findAll" resultMap="departmentMap">
+        select * from department where state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultMap="departmentMap">
+        select * from department where state =1
+        and concat(department_id,department_name,teacher_name) like CONCAT('%',#{key},'%')
+    </select>
+    <!--添加-->
+    <insert id="addDepartment" parameterType="Department">
+        insert into department(department_name,teacher_name,admin_name)
+        values(#{departmentName},#{teacherName},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int" resultMap="departmentMap">
+        select * from department where department_id = #{departmentId} and state=1
+    </select>
+    <!--修改-->
+    <update id="updateDepartment" parameterType="Department">
+        update department set department_name=#{departmentName},teacher_name=#{teacherName},admin_name=#{adminName}
+        where department_id=#{departmentId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteDepartment" parameterType="int">
+        update department set state=0 where department_id=#{departmentId}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  department where department_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

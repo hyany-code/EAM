@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.MajorDao">
+    <resultMap id="majorMap" type="Major">
+        <id property="majorId" column="major_id" javaType="Integer"></id>
+        <result property="majorName" column="major_name" javaType="java.lang.String"></result>
+        <result property="adminName" column="admin_name" javaType="java.lang.String"></result>
+        <result property="createTime" column="create_time" javaType="Date"></result>
+        <result property="updateTime" column="update_time" javaType="Date"></result>
+        <result property="state" column="state" javaType="Integer"></result>
+        <result property="departmentId" column="department_id" javaType="Integer"></result>
+    </resultMap>
+    <!--查询所有-->
+    <select id="findAll" resultMap="majorMap">
+        select * from major where state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultMap="majorMap">
+        select * from major where state =1
+        and concat(major_id,major_name,department_id) like '%' #{key} '%'
+    </select>
+    <!--添加-->
+    <insert id="addMajor" parameterType="Major">
+        insert into major(major_name,department_id,admin_name)
+        values(#{majorName},#{departmentId},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int" resultMap="majorMap">
+        select * from major where major_id = #{majorId} and state=1
+    </select>
+    <!--修改-->
+    <update id="updateMajor" parameterType="Major">
+        update major set major_name=#{majorName},department_id=#{departmentId},admin_name=#{adminName}
+        where major_id=#{majorId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteMajor" parameterType="int">
+        update major set state=0 where major_id=#{majorId}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  major where major_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

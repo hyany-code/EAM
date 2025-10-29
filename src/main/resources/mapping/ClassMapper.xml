@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.ClassesDao">
+    <resultMap id="classesMap" type="Classes">
+        <id property="classId" column="class_id" javaType="Integer"></id>
+        <result property="className" column="class_name" javaType="java.lang.String"></result>
+        <result property="majorId" column="major_id" javaType="Integer"></result>
+        <result property="adminName" column="admin_name" javaType="java.lang.String"></result>
+        <result property="createTime" column="create_time" javaType="Date"></result>
+        <result property="updateTime" column="update_time" javaType="Date"></result>
+        <result property="state" column="state" javaType="Integer"></result>
+    </resultMap>
+    <!--查询所有-->
+    <select id="findAll" resultMap="classesMap">
+        select * from class where 1=1 and state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultMap="classesMap">
+        select * from class where state =1
+        and concat(class_id,class_name,major_id) like '%' #{key} '%'
+    </select>
+    <!--添加-->
+    <insert id="addClasses" parameterType="Classes">
+        insert into class(class_name,major_id,admin_name)
+        values(#{className},#{majorId},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int" resultMap="classesMap">
+        select * from class where class_id = #{classId} and state=1
+    </select>
+    <!--修改-->
+    <update id="updateClasses" parameterType="classes">
+        update class set class_name=#{className},major_id=#{majorId},admin_name=#{adminName}
+        where class_id=#{classId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteClasses" parameterType="int">
+        update class set state=0 where class_id=#{classId}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  class where class_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

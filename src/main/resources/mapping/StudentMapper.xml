@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.StudentDao">
+    <!--<resultMap id="studentInfoMap" type="Student">-->
+        <!--<id property="studentId" column="student_id" javaType="Integer"></id>-->
+        <!--<result property="studentName" column="student_name" javaType="String"></result>-->
+        <!--<result property="majorId" column="course_type" javaType="String"></result>-->
+        <!--<result property="classId" column="teacher_id" javaType="Integer"></result>-->
+        <!--<result property="departmentId" column="department_id" javaType="Integer"></result>-->
+        <!--<result property="academicYear"  column="academic_year" javaType="String"></result>-->
+        <!--<association property="department"  -->
+    <!--</resultMap>-->
+
+    <!--登录-查询所有学生信息-->
+    <select id="getStudent" parameterType="map" resultType="com.study.xuanke.model.Student">
+        select * from student
+        where 1=1
+        <if test="studentId != null">
+            and student_id = #{studentId}
+        </if>
+        <if test="studentPassword != null">
+            and student_password = #{studentPassword}
+        </if>
+    </select>
+    <!--  查询全部成绩  -->
+    <select id="queryScoreList" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.academic_year,c.semester,c.course_id,c.course_name,c.credit,c.exam_type,se.score,se.gpa,
+                        d.department_name,c.course_type,cl.class_name,t.teacher_name,
+                        se.option_id
+
+        FROM selectedcourse se,course c,student s,department d,major m,class cl,teacher t
+        WHERE se.course_id=c.course_id
+          and se.student_id=s.student_id
+          and c.department_id=d.department_id
+          AND s.major_id=m.major_id
+          AND s.class_id=cl.class_id
+          AND se.teacher_id = t.teacher_id
+          and se.state=1
+          and se.student_id=#{studentId}
+    </select>
+    <!--  根据关键字查询成绩  -->
+    <select id="queryScoreByKey" parameterType="map" resultType="com.study.xuanke.model.SelectedCourse">
+        SELECT DISTINCT c.academic_year,c.semester,c.course_id,c.course_name,c.credit,c.exam_type,se.score,se.gpa,
+                        d.department_name,c.course_type,cl.class_name,t.teacher_name,
+            se.option_id
+        FROM selectedcourse se,course c,student s,department d,major m,class cl,teacher t
+        WHERE se.course_id=c.course_id
+        and se.student_id=s.student_id
+        and c.department_id=d.department_id
+        AND s.major_id=m.major_id
+        AND s.class_id=cl.class_id
+        AND se.teacher_id = t.teacher_id
+        and se.state=1
+        and se.student_id=#{studentId}
+        <if test="academicYear != null and academicYear != ''">
+            AND c.academic_year LIKE '%' #{academicYear} '%'
+        </if>
+        <if test="semester != null and semester != ''">
+            AND c.semester LIKE '%' #{semester} '%'
+        </if>
+</select>
+<!--  查询需要查询的报告记录条数  -->
+    <select id="queryScoreCount" parameterType="com.study.xuanke.model.SelectedCourse" resultType="integer">
+        SELECT
+        COUNT(*)
+        FROM selectedcourse
+        WHERE 1 = 1
+    </select>
+
+<!--    <update id="update" parameterType="com.study.xuanke.model.Student">-->
+<!--        update student-->
+<!--        <trim prefix="set" suffixOverrides=",">-->
+<!--            <if test="studentId != null">-->
+<!--                student_id = #{studentId},-->
+<!--            </if>-->
+<!--            <if test="studentPassword != null and ''!= studentPassword">-->
+<!--                student_password = #{studentPassword},-->
+<!--            </if>-->
+<!--        </trim>-->
+<!--        where student_id = #{studentId}-->
+<!--    </update>-->
+    <!--查询所有-->
+    <select id="findAll" resultType="student">
+        select * from student where state = 1
+    </select>
+    <!--根据关键字查询-->
+    <select id="findByKey" resultType="student">
+        select * from student where state =1
+        and concat(student_name,student_sex,department_id,major_id,class_id) like '%' #{key} '%'
+    </select>
+    <!--添加-->
+    <insert id="addStudent" parameterType="Student">
+        insert into student(student_name,student_sex,department_id,major_id,class_id,student_password,admin_name)
+        values(#{studentName},#{studentSex},#{departmentId},#{majorId},#{classId},#{studentPassword},#{adminName})
+    </insert>
+    <!--获得单个对象-->
+    <select id="getById" parameterType="int" resultType="student">
+        select * from student where student_id = #{studentId} and state=1
+    </select>
+    <!--修改-->
+    <update id="updateStudent" parameterType="Student">
+        update student set student_name=#{studentName},student_sex=#{studentSex},department_id=#{departmentId},major_id=#{majorId},class_id=#{classId},student_password=#{studentPassword},admin_name=#{adminName}
+        where student_id=#{studentId}
+    </update>
+    <!--逻辑删除-->
+    <update id="deleteStudent" parameterType="int">
+        update student set state=0 where student_id=#{studentId}
+    </update>
+    <delete id="batchDeletes" parameterType="java.util.List">
+        delete  from  student where student_id in
+        <!--循环删除 -->
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <!--修改密码-->
+    <update id="updatePassword">
+        update student
+        set student_password = #{studentPassword}
+        where student_id=#{studentId}
+    </update>
+<!--学生个人信息显示-->
+    <select id="findStudentInfo" parameterType="map" resultType="com.study.xuanke.model.Student">
+        SELECT stu.student_name,d.department_name,m.major_name,c.class_name
+FROM student stu,department d,major m,class c
+WHERE
+stu.department_id = d.department_id
+AND stu.major_id = m.major_id
+AND stu.class_id = c.class_id
+AND stu.state = 1
+AND stu.student_id = #{stuentId}
+    </select>
+    <!--<select id="findStudentInfo" parameterType="map" resultType="com.study.xuanke.model.Student">-->
+        <!--select department.department_name,major.major_name,class.class_name from-->
+ <!--student,department,major,class where student.department_id=department.department_id-->
+<!--and student.major_id=major.major_id-->
+<!--and student.class_id=class.class_id and student.state=1 and student.student_id=#{studentId}-->
+    <!--</select>-->
+
+</mapper>

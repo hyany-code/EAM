@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.xuanke.dao.AdminDao">
+    <!--修改密码-->
+    <update id="updatePassword">
+        update admin
+        set admin_password = #{adminPassword}
+        where admin_id=#{adminId}
+    </update>
+
+    <!--登录-查询所有管理员信息-->
+    <select id="getAdmin" parameterType="map" resultType="com.study.xuanke.model.Admin">
+        select * from admin
+        where 1=1
+        <if test="adminId != null">
+            and admin_id = #{adminId}
+        </if>
+        <if test="adminPassword != null">
+            and admin_password = #{adminPassword}
+        </if>
+    </select>
+</mapper>

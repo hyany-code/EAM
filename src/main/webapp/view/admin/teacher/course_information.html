@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="../../../css/bootstrap.css">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="../../../js/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../js/alert.min.js"></script>
+    <script>
+        //    $('.alert').on('click', function () {
+        //      $.alert('成功');
+        //    });
+        $(function(){
+
+            $('.del').on('click', function () {
+                $.confirm('确认要删除吗？', function (isConfirm) {
+                    if (isConfirm) {
+                        $.alert('确认');
+                    } else {
+                        $.alert('取消');
+                    }
+                });
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+
+<div style="padding:0px; margin:0px;">
+    <ul class="breadcrumb" style="  margin:0px; " >
+        <li><a href="#">所授课程</a></li>
+        <li>课程列表</li>
+    </ul>
+</div>
+<div class="row alert alert-info" style="margin:5px 0px 5px 0px; padding:3px;">
+    <form class="form-inline" action="#">
+        <div class="form-group">
+            <input type="text" name="kw" class="form-control" id="activename" placeholder="请输入关键字">
+        </div>
+        <input type="submit" class="btn btn-danger" value="查询"/>
+        <a class="btn btn-success" href="course_add.html">增加</a>
+        <a href="#">
+            <span class="glyphicon glyphicon-trash del" aria-hidden="true">批量删除</span>
+        </a>
+    </form>
+</div>
+<div class="row" style="padding:15px; padding-top:0px; ">
+    <table class="table  table-condensed table-striped">
+        <tr>
+            <th>课程代码</th>
+            <th>课程名称</th>
+            <th>教授老师</th>
+            <th>开课学院</th>
+            <th>上课时间</th>
+            <th>上课地点</th>
+            <th>考察类型</th>
+            <th>课时</th>
+            <th>学分</th>
+            <th>操作</th>
+            <th><input id="all" type="checkbox" value="all" name="allSelect">全选/取消</th>
+        </tr>
+        <tr>
+            <td>001</td>
+            <td>C语言</td>
+            <td>张三</td>
+            <td>信息工程学院</td>
+            <td>周三3、4</td>
+            <td>1#201</td>
+            <td>考试</td>
+            <td>32</td>
+            <td>2</td>
+            <td>
+                <a href="course_update.html">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true">修改</span>
+                </a>
+                <a href="#">
+                    <span class="glyphicon glyphicon-trash del" aria-hidden="true">删除</span>
+                </a>
+            </td>
+            <td><input id="1" type="checkbox" value="1" name="allSelect"></td>
+        </tr>
+        <tr>
+            <td>002</td>
+            <td>数据结构</td>
+            <td>张三</td>
+            <td>信息工程学院</td>
+            <td>周四1、2</td>
+            <td>3#303</td>
+            <td>考察</td>
+            <td>32</td>
+            <td>2</td>
+            <td>
+                <a href="course_update.html">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true">修改</span>
+                </a>
+                <a href="#">
+                    <span class="glyphicon glyphicon-trash del" aria-hidden="true">删除</span>
+                </a>
+            </td>
+            <td><input id="1" type="checkbox" value="1" name="allSelect"></td>
+        </tr>
+        <tr>
+            <td>003</td>
+            <td>音乐鉴赏</td>
+            <td>张三</td>
+            <td>艺术学院</td>
+            <td>周四9/10</td>
+            <td>4#303</td>
+            <td>考察</td>
+            <td>16</td>
+            <td>2</td>
+            <td>
+                <a href="course_update.html">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true">修改</span>
+                </a>
+                <a href="#">
+                    <span class="glyphicon glyphicon-trash del" aria-hidden="true">删除</span>
+                </a>
+            <td><input id="1" type="checkbox" value="1" name="allSelect"></td>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

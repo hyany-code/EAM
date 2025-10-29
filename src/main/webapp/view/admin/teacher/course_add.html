@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="../../../css/bootstrap.css">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="../../../js/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="../../../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../js/alert.min.js"></script>
+</head>
+<body>
+<div style="padding:5px; margin:0px;">
+    <ul class="breadcrumb" style="  margin:0px; " >
+        <li><a href="#">学院管理</a></li>
+        <li>学院院系</li>
+    </ul>
+</div>
+
+<form action="product_list.html" class="form-horizontal">
+
+    <!--开始 -->
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">课程代码</label>
+                <div class="col-sm-9">
+                    <input type="text" name="courseId" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">课程名称</label>
+                <div class="col-sm-9">
+                    <input type="text" name="courseName" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">授课教师</label>
+                <div class="col-sm-9">
+                    <input type="text" name="teacherName" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开课学院</label>
+                <div class="col-sm-9">
+                    <input type="text" name="departmentName" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">上课时间</label>
+                <div class="col-sm-9">
+                    <input type="text" name="className" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">上课地点</label>
+                <div class="col-sm-9">
+                    <input type="text" name="classLocation" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">考察类型</label>
+                <div class="col-sm-9">
+                    <input type="text" name="testType" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">课时</label>
+                <div class="col-sm-9">
+                    <input type="text" name="classHour" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">学分</label>
+                <div class="col-sm-9">
+                    <input type="text" name="courseCredit" class="form-control input-sm" />
+                </div>
+            </div>
+            </div>
+        </div>
+    <!--结束 -->
+    <div class="row">
+        <div class="col-sm-3 col-sm-offset-2">
+            <input  type="submit" class="btn btn-success" value="提交"/>
+            <a class="btn btn-warning" href="course_information.html">返回上一级</a>
+        </div>
+    </div>
+</form>
+</body>
+</html>
